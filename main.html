@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Car Showroom</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Added video background container */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .video-background video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 0;
+        }
+
+        /* Updated main page styles for video background */
+        .main-page {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            color: white;
+        }
+
+        .main-page.hidden {
+            display: none;
+        }
+
+        .main-title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .main-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            line-height: 1.6;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Updated start button styles */
+        .start-btn {
+            background: #ff2e63;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 46, 99, 0.3);
+            transition: all 0.3s ease;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .start-btn:hover {
+            background: #e01e4f;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(255, 46, 99, 0.4);
+        }
+
+        /* Car selection page styles */
+        .car-selection {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+        }
+
+        .car-selection.active {
+            display: flex;
+        }
+
+        .selection-title {
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .selection-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 50px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .car-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .car-option {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .car-option:hover {
+            transform: translateY(-10px) scale(1.05);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .car-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .car-name {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .car-description {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Visualization page styles */
+        .visualization {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .visualization.active {
+            display: flex;
+        }
+
+        .visualization.ferrari {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.9), rgba(139, 0, 0, 0.9));
+        }
+
+        .visualization.hyundai {
+            background: linear-gradient(135deg, rgba(30, 144, 255, 0.9), rgba(0, 100, 200, 0.9));
+        }
+
+        .viz-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .viz-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .viz-image {
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .viz-description {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .viz-features {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .viz-features h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .viz-features ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .viz-features li {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .viz-features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #ffdf5d;
+            font-weight: bold;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 3rem;
+            }
+
+            .main-subtitle {
+                font-size: 1.2rem;
+                padding: 0 20px;
+            }
+
+            .selection-title {
+                font-size: 2.5rem;
+            }
+
+            .car-options {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .car-option {
+                padding: 25px;
+            }
+
+            .viz-container {
+                padding: 30px 20px;
+            }
+
+            .viz-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Added video background -->
+    <div class="video-background">
+        <video autoplay muted loop>
+            <source src="/3d.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    <div class="video-overlay"></div>
+
+    <!-- Simplified main homepage with video background -->
+    <div class="main-page" id="mainPage">
+        <h1 class="main-title"></h1>
+        <p class="main-subtitle">
+            
+        </p>
+        <button class="start-btn" onclick="showCarSelection()">Start Experience</button>
+    </div>
+
+    <!-- Car selection page -->
+    <div class="car-selection" id="carSelection">
+        <button class="back-btn" onclick="showMainPage()">← Back</button>
+        
+        <h1 class="selection-title">Choose Your Dream Car</h1>
+        <p class="selection-subtitle">Select from our premium collection of luxury vehicles</p>
+        
+        <div class="car-options">
+            <div class="car-option" onclick="showVisualization('ferrari')">
+                <img src="/images/f1.jpg" alt="Ferrari" class="car-image">
+                <h2 class="car-name">Ferrari</h2>
+                <p class="car-description">Experience the pinnacle of Italian engineering and design. Pure performance meets luxury.</p>
+                <button class="vehicle-btn ferrari" onclick="location.href='JS-3D-Car-master/index1.html'">
+                        Ferrari
+                    </button>
+
+            </div>
+            
+            <div class="car-option" onclick="showVisualization('hyundai')">
+                <img src="/images/c1.jpg" alt="Hyundai Creta" class="car-image">
+                <h2 class="car-name">Hyundai Creta</h2>
+                <p class="car-description">Smart technology meets practical luxury. The perfect blend of style and functionality.</p>
+                <button class="vehicle-btn hyundai" onclick="location.href='hyundai/index2.html?model=hyundai'">
+                    Hyundai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visualization page -->
+    <div class="visualization" id="visualization">
+        <button class="back-btn" onclick="showCarSelection()">← Back</button>
+        
+        <div class="viz-container">
+            <h1 class="viz-title" id="vizTitle">Car Visualization</h1>
+            <img src="/placeholder.svg" alt="Selected Car" class="viz-image" id="vizImage">
+            <p class="viz-description" id="vizDescription">Loading 3D visualization...</p>
+            
+            <div class="viz-features" id="vizFeatures">
+                <h3>Key Features:</h3>
+                <ul id="featuresList">
+                    <li>360° Interactive View</li>
+                    <li>Detailed Interior Exploration</li>
+                    <li>Color Customization</li>
+                    <li>Performance Specifications</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMainPage() {
+            document.getElementById('mainPage').classList.remove('hidden');
+            document.getElementById('carSelection').classList.remove('active');
+            document.getElementById('visualization').classList.remove('active');
+        }
+
+        function showCarSelection() {
+            document.getElementById('mainPage').classList.add('hidden');
+            document.getElementById('carSelection').classList.add('active');
+            document.getElementById('visualization').classList.remove('active');
+        }
+
+        function showVisualization(carType) {
+            document.getElementById('carSelection').classList.remove('active');
+            const vizElement = document.getElementById('visualization');
+            vizElement.classList.add('active');
+            
+            vizElement.className = `visualization active ${carType}`;
+            
+            const vizTitle = document.getElementById('vizTitle');
+            const vizImage = document.getElementById('vizImage');
+            const vizDescription = document.getElementById('vizDescription');
+            const featuresList = document.getElementById('featuresList');
+            
+            if (carType === 'ferrari') {
+                vizTitle.textContent = 'Ferrari Experience';
+                vizImage.src = '/images/ferrari.jpg';
+                vizDescription.textContent = 'Immerse yourself in the world of Ferrari with our interactive 3D model. Experience the art of performance and Italian craftsmanship.';
+                featuresList.innerHTML = `
+                    <li>V8 Twin-Turbo Engine - 720 HP</li>
+                    <li>0-100 km/h in 2.9 seconds</li>
+                    <li>Top Speed: 340 km/h</li>
+                    <li>Carbon Fiber Aerodynamics</li>
+                    <li>Racing Heritage Technology</li>
+                `;
+            } else if (carType === 'hyundai') {
+                vizTitle.textContent = 'Hyundai Creta Experience';
+                vizImage.src = '/images/hyundai.jpg';
+                vizDescription.textContent = 'Discover the Hyundai Creta through our comprehensive 3D visualization. Experience smart mobility redefined.';
+                featuresList.innerHTML = `
+                    <li>1.5L Turbo Engine - 160 HP</li>
+                    <li>Fuel Economy: 6.8L/100km</li>
+                    <li>Smart Connect Technology</li>
+                    <li>BlueLink Connected Services</li>
+                    <li>Advanced Safety Features</li>
+                `;
+            }
+        }
+
+        // Enhanced button interactions
+        document.querySelectorAll('.start-btn, .car-option, .back-btn').forEach(element => {
+            element.addEventListener('click', function(e) {
+                // Create ripple effect
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                    z-index: 10;
+                `;
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
