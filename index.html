@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium 3D Car Showroom</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>Loading Premium Cars...</h2>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loadingProgress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Showroom -->
+    <div id="showroom" class="showroom hidden">
+        <!-- Header -->
+        <header class="showroom-header">
+            <div class="logo">
+                <h1>🏎️ Premium Showroom</h1>
+            </div>
+            <nav class="main-nav">
+                <button class="nav-btn active" data-section="cars">Cars</button>
+                <button class="nav-btn" data-section="customize">Customize</button>
+                <button class="nav-btn" data-section="specs">Specs</button>
+            </nav>
+        </header>
+
+        <!-- Car Selection Panel -->
+        <div class="car-selection-panel">
+            <h3>Select Your Dream Car</h3>
+            <div class="car-thumbnails">
+                <div class="car-thumb active" data-car="ferrari">
+                    <img src="https://images.pexels.com/photos/544542/pexels-photo-544542.jpeg?auto=compress&cs=tinysrgb&w=300" alt="Ferrari">
+                    <span>Ferrari 488</span>
+                </div>
+                <div class="car-thumb" data-car="lamborghini">
+                    <img src="https://images.pexels.com/photos/2127733/pexels-photo-2127733.jpeg?auto=compress&cs=tinysrgb&w=300" alt="Lamborghini">
+                    <span>Lamborghini</span>
+                </div>
+                <div class="car-thumb" data-car="porsche">
+                    <img src="https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=300" alt="Porsche">
+                    <span>Porsche 911</span>
+                </div>
+                <div class="car-thumb" data-car="mclaren">
+                    <img src="https://images.pexels.com/photos/1719648/pexels-photo-1719648.jpeg?auto=compress&cs=tinysrgb&w=300" alt="McLaren">
+                    <span>McLaren</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3D Viewport -->
+        <div id="viewport" class="viewport"></div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <!-- Car Customization -->
+            <div class="control-section active" id="customizeSection">
+                <h3>🎨 Customize Your Car</h3>
+                
+                <div class="control-group">
+                    <label>Body Color</label>
+                    <div class="color-palette">
+                        <div class="color-option active" data-color="#FF0000" style="background: #FF0000;"></div>
+                        <div class="color-option" data-color="#0066FF" style="background: #0066FF;"></div>
+                        <div class="color-option" data-color="#000000" style="background: #000000;"></div>
+                        <div class="color-option" data-color="#FFFFFF" style="background: #FFFFFF;"></div>
+                        <div class="color-option" data-color="#FFD700" style="background: #FFD700;"></div>
+                        <div class="color-option" data-color="#00FF00" style="background: #00FF00;"></div>
+                        <div class="color-option" data-color="#FF6600" style="background: #FF6600;"></div>
+                        <div class="color-option" data-color="#800080" style="background: #800080;"></div>
+                    </div>
+                    <input type="color" id="customColor" class="custom-color-picker" value="#FF0000">
+                </div>
+
+                <div class="control-group">
+                    <label>Wheel Style</label>
+                    <select id="wheelStyle" class="control-select">
+                        <option value="sport">Sport Wheels</option>
+                        <option value="racing">Racing Wheels</option>
+                        <option value="luxury">Luxury Wheels</option>
+                        <option value="carbon">Carbon Fiber</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Interior</label>
+                    <select id="interiorStyle" class="control-select">
+                        <option value="leather">Black Leather</option>
+                        <option value="red-leather">Red Leather</option>
+                        <option value="carbon">Carbon Fiber</option>
+                        <option value="alcantara">Alcantara</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Metallic Finish</label>
+                    <input type="range" id="metallicSlider" min="0" max="1" step="0.1" value="0.8" class="control-slider">
+                    <span class="slider-value">80%</span>
+                </div>
+
+                <div class="control-group">
+                    <label>Roughness</label>
+                    <input type="range" id="roughnessSlider" min="0" max="1" step="0.1" value="0.2" class="control-slider">
+                    <span class="slider-value">20%</span>
+                </div>
+            </div>
+
+            <!-- Camera Controls -->
+            <div class="control-section">
+                <h3>📷 Camera Controls</h3>
+                
+                <div class="control-group">
+                    <label>View Preset</label>
+                    <div class="view-buttons">
+                        <button class="view-btn active" data-view="front">Front</button>
+                        <button class="view-btn" data-view="side">Side</button>
+                        <button class="view-btn" data-view="rear">Rear</button>
+                        <button class="view-btn" data-view="top">Top</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Auto Rotate</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="autoRotate" checked>
+                        <label for="autoRotate" class="toggle-label"></label>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Zoom</label>
+                    <input type="range" id="zoomSlider" min="2" max="10" step="0.5" value="5" class="control-slider">
+                    <span class="slider-value">5x</span>
+                </div>
+            </div>
+
+            <!-- Environment -->
+            <div class="control-section">
+                <h3>🌍 Environment</h3>
+                
+                <div class="control-group">
+                    <label>Background</label>
+                    <select id="environmentSelect" class="control-select">
+                        <option value="showroom">Showroom</option>
+                        <option value="garage">Garage</option>
+                        <option value="city">City</option>
+                        <option value="sunset">Sunset</option>
+                        <option value="studio">Studio</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Lighting</label>
+                    <input type="range" id="lightingSlider" min="0.5" max="3" step="0.1" value="1.5" class="control-slider">
+                    <span class="slider-value">150%</span>
+                </div>
+
+                <div class="control-group">
+                    <label>Shadows</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="shadowsToggle" checked>
+                        <label for="shadowsToggle" class="toggle-label"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Car Info Panel -->
+        <div class="car-info-panel">
+            <div class="car-info-content">
+                <h2 id="carName">Ferrari 488 GTB</h2>
+                <div class="car-stats">
+                    <div class="stat">
+                        <span class="stat-label">Power</span>
+                        <span class="stat-value" id="carPower">661 HP</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">0-100 km/h</span>
+                        <span class="stat-value" id="carAcceleration">3.0s</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Top Speed</span>
+                        <span class="stat-value" id="carTopSpeed">330 km/h</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Price</span>
+                        <span class="stat-value" id="carPrice">$280,000</span>
+                    </div>
+                </div>
+                <button class="configure-btn">Configure & Order</button>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="action-btn" id="screenshotBtn">📸 Screenshot</button>
+            <button class="action-btn" id="shareBtn">🔗 Share</button>
+            <button class="action-btn" id="fullscreenBtn">⛶ Fullscreen</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
